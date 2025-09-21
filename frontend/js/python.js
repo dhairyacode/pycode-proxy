@@ -7,7 +7,7 @@ const animatedText = document.getElementById("animatedText");
 
 let currentVersion = "v1.0";
 
-// --- Typing animation for AI messages ---
+// --- ChatGPT-style typing for AI messages ---
 function typeAIMessage(text, isCode = false) {
   const msgDiv = document.createElement("div");
   msgDiv.className = "chat-message left";
@@ -16,16 +16,15 @@ function typeAIMessage(text, isCode = false) {
 
   let i = 0;
   function typeChar() {
-    if (i < text.length) {
+    if (i <= text.length) {
       if (isCode) {
-        // Code container style
         msgDiv.innerHTML = `<strong>PYCODE:</strong> Here is the code you asked for<br><div class="pycode-container">${text.substring(0, i)}</div>`;
       } else {
         msgDiv.textContent = "PYCODE: " + text.substring(0, i);
       }
       i++;
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      setTimeout(typeChar, 20); // typing speed
+      setTimeout(typeChar, 20);
     }
   }
   typeChar();
@@ -72,19 +71,22 @@ function handleV1(message) {
   }
 }
 
-// --- v1.5: Piston API fetch ---
+// --- v1.5: Piston API ---
 async function handleV15(code) {
   try {
-    const response = await fetch("https://pycode-proxy.vercel.app/api/piston.js", {
+    const response = await fetch("https://pycode-proxy.vercel.app/api/piston", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language: "python3", code: code })
+      body: JSON.stringify({ language: "python3", code })
     });
     const data = await response.json();
-    if (data.output) return data.output;
-    else return "PYCODE: This request is out of beyond my capabilities. please provide me a suitable request";
+    console.log("V15 RAW:", data);
+
+    if (data?.output) return data.output;
+    else return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request.";
   } catch (err) {
-    return "PYCODE: This request is out of beyond my capabilities. please provide me a suitable request";
+    console.log("V15 ERROR:", err);
+    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request.";
   }
 }
 
@@ -109,31 +111,36 @@ sendBtn.addEventListener("click", async () => {
 
 userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
 
-themeSelect.addEventListener("change", () => { document.body.className = themeSelect.value + "-mode"; });
+themeSelect.addEventListener("change", () => {
+  document.body.className = themeSelect.value + "-mode";
+});
 
 versionSelect.addEventListener("change", async () => {
   currentVersion = versionSelect.value;
   messagesContainer.innerHTML = "";
-  typeAIMessage(`PYCODE: How can i help you today??`);
+  typeAIMessage("PYCODE: How can I help you today?");
 });
 
-// --- Animated header typing effect ---
+// --- Header animated typing ---
 const texts = [
   "HELPING THE LOGIC CREATOR",
-  "a New era with python and programming",
-  "This Snake won't bite you"
+  "A new era with Python and programming",
+  "This snake won't bite you"
 ];
+
 let textIndex = 0, charIndex = 0;
 function typeEffect() {
   if (charIndex < texts[textIndex].length) {
     animatedText.textContent += texts[textIndex].charAt(charIndex);
     charIndex++;
     setTimeout(typeEffect, 100);
-  } else setTimeout(eraseEffect, 1500);
+  } else {
+    setTimeout(eraseEffect, 1500);
+  }
 }
 function eraseEffect() {
   if (charIndex > 0) {
-    animatedText.textContent = texts[textIndex].substring(0, charIndex - 1);
+    animatedText.textContent = texts[textIndex].substring(0, charIndex);
     charIndex--;
     setTimeout(eraseEffect, 50);
   } else {
