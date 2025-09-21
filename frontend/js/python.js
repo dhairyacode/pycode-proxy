@@ -74,23 +74,20 @@ function handleV1(message) {
 // --- v1.5: Piston API ---
 async function handleV15(code) {
   try {
-    const response = await fetch("https://pycode-proxy.vercel.app/api/piston", {
+    const response = await fetch("https://pycode-proxy.vercel.app/api/piston.js", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language: "python3", code })
+      body: JSON.stringify({ language: "python3", code: code })
     });
     const data = await response.json();
-    console.log("V15 RAW:", data);
 
-    // Check the structure
-    if (data?.run && data.run.length > 0) {
-      return data.run[0].stdout || "No output was returned.";
-    } else {
-      return "This request is beyond my capabilities. Please provide a suitable request.";
-    }
+    // Adjusted for nested structure
+    const output = data?.run?.stdout || data?.run?.output;
+    if (output) return output;
+    return "PYCODE: This request is out of beyond my capabilities. please provide me a suitable request";
+
   } catch (err) {
-    console.log("V15 ERROR:", err);
-    return "This request is beyond my capabilities. Please provide a suitable request.";
+    return "PYCODE: This request is out of beyond my capabilities. please provide me a suitable request";
   }
 }
 
