@@ -16,11 +16,11 @@ function typeAIMessage(text, isCode = false) {
 
   let i = 0;
   function typeChar() {
-    if (i <= text.length) {
+    if (i < text.length) {  // ensure last character displays
       if (isCode) {
-        msgDiv.innerHTML = `<strong>PYCODE:</strong> Here is the code you asked for<br><div class="pycode-container">${text.substring(0, i)}</div>`;
+        msgDiv.innerHTML = `<strong>PYCODE:</strong> Here is the code you asked for<br><div class="pycode-container">${text.substring(0, i + 1)}</div>`;
       } else {
-        msgDiv.textContent = "PYCODE: " + text.substring(0, i);
+        msgDiv.textContent = "PYCODE: " + text.substring(0, i + 1);
       }
       i++;
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -74,7 +74,7 @@ function handleV1(message) {
 // --- v1.5: Piston API ---
 async function handleV15(code) {
   try {
-    const response = await fetch("/api/piston", { // Note: just "/api/piston" in Vercel
+    const response = await fetch("/api/piston", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code })
@@ -89,6 +89,7 @@ async function handleV15(code) {
     return "PYCODE: Error executing code";
   }
 }
+
 // --- Get AI response ---
 async function getResponse(message) {
   if (currentVersion === "v1.0") return handleV1(message);
