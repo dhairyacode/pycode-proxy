@@ -114,7 +114,7 @@ themeSelect.addEventListener("change", () => { document.body.className = themeSe
 versionSelect.addEventListener("change", async () => {
   currentVersion = versionSelect.value;
   messagesContainer.innerHTML = "";
-  typeAIMessage(`You are now using ${currentVersion}`);
+  typeAIMessage(`PYCODE: How can i help you today??`);
 });
 
 // --- Animated header typing effect ---
