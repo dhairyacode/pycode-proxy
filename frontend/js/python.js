@@ -74,21 +74,23 @@ function handleV1(message) {
 // --- v1.5: Piston API ---
 async function handleV15(code) {
   try {
-    const response = await fetch("https://pycode-proxy.vercel.app/api/piston.js", {
+    const response = await fetch("/api/piston.js", {  // local relative URL
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language: "python3", code: code })
+      body: JSON.stringify({ language: "python3", code })
     });
+
     const data = await response.json();
 
-    // Correctly read the "output" property
+    // Correctly read the top-level output property
     if (data.output) return data.output;
-    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request";
+    return "PYCODE: This request is beyond my capabilities. Please provide a suitable request";
+
   } catch (err) {
-    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request";
+    console.error("handleV15 error:", err);
+    return "PYCODE: Unable to reach the API. Please try again later.";
   }
 }
-
 // --- Get AI response ---
 async function getResponse(message) {
   if (currentVersion === "v1.0") return handleV1(message);
