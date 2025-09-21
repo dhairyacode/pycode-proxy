@@ -81,14 +81,11 @@ async function handleV15(code) {
     });
     const data = await response.json();
 
-    // Use the correct property returned by your API
-    const output = data?.output;
-    if (output) return output;
-    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request.";
-
+    // Correctly read the "output" property
+    if (data.output) return data.output;
+    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request";
   } catch (err) {
-    console.error(err); // always log errors for debugging
-    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request.";
+    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request";
   }
 }
 
