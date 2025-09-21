@@ -74,19 +74,16 @@ function handleV1(message) {
 // --- v1.5: Piston API ---
 async function handleV15(code) {
   try {
-    const response = await fetch("https://pycode-proxy.vercel.app/api/piston", {
+    const response = await fetch("https://pycode-proxy.vercel.app/api/piston.js", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language: "python3", code })
+      body: JSON.stringify({ language: "python3", code: code })
     });
     const data = await response.json();
-    console.log("V15 RAW:", data);
-
-    if (data?.output) return data.output;
-    else return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request.";
+    if (data.output) return data.output;
+    else return "PYCODE: I'm not able to fetch this code.";
   } catch (err) {
-    console.log("V15 ERROR:", err);
-    return "PYCODE: This request is out of beyond my capabilities. Please provide a suitable request.";
+    return "PYCODE: I'm not able to fetch this code.";
   }
 }
 
@@ -118,7 +115,7 @@ themeSelect.addEventListener("change", () => {
 versionSelect.addEventListener("change", async () => {
   currentVersion = versionSelect.value;
   messagesContainer.innerHTML = "";
-  typeAIMessage("PYCODE: How can I help you today?");
+  typeAIMessage("How can I help you today?");
 });
 
 // --- Header animated typing ---
