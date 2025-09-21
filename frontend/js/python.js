@@ -74,7 +74,7 @@ function handleV1(message) {
 // --- v1.5: Piston API ---
 async function handleV15(code) {
   try {
-    const response = await fetch("/api/piston", {
+    const response = await fetch("https://pycode-server.onrender.com/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code })
