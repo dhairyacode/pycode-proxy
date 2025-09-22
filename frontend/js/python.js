@@ -14,20 +14,34 @@ function typeAIMessage(text, isCode = false) {
   messagesContainer.appendChild(msgDiv);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-  let i = 0;
-  function typeChar() {
-    if (i < text.length) {  // ensure last character displays
-      if (isCode) {
-        msgDiv.innerHTML = `<strong>PYCODE:</strong> Here is the code you asked for<br><div class="pycode-container">${text.substring(0, i + 1)}</div>`;
-      } else {
-        msgDiv.textContent = "PYCODE: " + text.substring(0, i + 1);
+  if (isCode) {
+    // Code block with syntax highlighting
+    msgDiv.innerHTML = `
+      <strong>PYCODE:</strong>Here is your output.<br>
+      <pre><code class="language-python">${escapeHTML(text)}</code></pre>
+    `;
+    // highlight.js will run after DOM update
+    setTimeout(() => {
+      msgDiv.querySelectorAll("code").forEach(el => hljs.highlightElement(el));
+    }, 50);
+  } else {
+    // Typing animation for plain text
+    let i = 0;
+    function typeChar() {
+      if (i <= text.length) {
+        msgDiv.textContent = "PYCODE: " + text.substring(0, i);
+        i++;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        setTimeout(typeChar, 20);
       }
-      i++;
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      setTimeout(typeChar, 20);
     }
+    typeChar();
   }
-  typeChar();
+}
+
+// Escape HTML for safety
+function escapeHTML(str) {
+  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 // --- Add user message ---
@@ -71,7 +85,7 @@ function handleV1(message) {
   }
 }
 
-// --- v1.5: Piston API ---
+// --- v1.5: Execution server ---
 async function handleV15(code) {
   try {
     const response = await fetch("https://pycode-server.onrender.com/execute", {
@@ -81,9 +95,7 @@ async function handleV15(code) {
     });
 
     const data = await response.json();
-    const output = data?.output || "PYCODE: No output returned";
-    return output;
-
+    return data?.output || "PYCODE: No output returned";
   } catch (err) {
     console.error(err);
     return "PYCODE: Error executing code";
@@ -109,7 +121,9 @@ sendBtn.addEventListener("click", async () => {
   typeAIMessage(response, currentVersion === "v1.5");
 });
 
-userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
+userInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendBtn.click();
+});
 
 themeSelect.addEventListener("change", () => {
   document.body.className = themeSelect.value + "-mode";
@@ -121,7 +135,7 @@ versionSelect.addEventListener("change", async () => {
   typeAIMessage("How can I help you today?");
 });
 
-// --- Header animated typing ---
+// --- Header animated typing (fixed reset issue) ---
 const texts = [
   "HELPING THE LOGIC CREATOR",
   "A new era with Python and programming",
@@ -130,6 +144,9 @@ const texts = [
 
 let textIndex = 0, charIndex = 0;
 function typeEffect() {
+  if (charIndex === 0) {
+    animatedText.textContent = ""; // reset before typing new text
+  }
   if (charIndex < texts[textIndex].length) {
     animatedText.textContent += texts[textIndex].charAt(charIndex);
     charIndex++;
@@ -140,7 +157,7 @@ function typeEffect() {
 }
 function eraseEffect() {
   if (charIndex > 0) {
-    animatedText.textContent = texts[textIndex].substring(0, charIndex);
+    animatedText.textContent = texts[textIndex].substring(0, charIndex - 1);
     charIndex--;
     setTimeout(eraseEffect, 50);
   } else {
@@ -148,4 +165,6 @@ function eraseEffect() {
     setTimeout(typeEffect, 500);
   }
 }
-document.addEventListener("DOMContentLoaded", () => { if (texts.length) typeEffect(); });
+document.addEventListener("DOMContentLoaded", () => {
+  if (texts.length) typeEffect();
+});
