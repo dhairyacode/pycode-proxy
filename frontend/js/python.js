@@ -4,10 +4,16 @@ const sendBtn = document.getElementById("sendBtn");
 const versionSelect = document.getElementById("versionSelect");
 const themeSelect = document.getElementById("themeSelect");
 const animatedText = document.getElementById("animatedText");
+const serverWakeup = document.getElementById("serverWakeup");
 
 let currentVersion = "v1.0";
 
-// --- ChatGPT-style typing for AI messages ---
+// --- Escape HTML ---
+function escapeHTML(str) {
+  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// --- Typing animation for AI messages ---
 function typeAIMessage(text, isCode = false) {
   const msgDiv = document.createElement("div");
   msgDiv.className = "chat-message left";
@@ -15,17 +21,16 @@ function typeAIMessage(text, isCode = false) {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   if (isCode) {
-    // Code block with syntax highlighting
+    // Code block with highlight.js
     msgDiv.innerHTML = `
-      <strong>PYCODE:</strong>Here is your output.<br>
+      <strong>PYCODE:</strong> Here is your output:<br>
       <pre><code class="language-python">${escapeHTML(text)}</code></pre>
     `;
-    // highlight.js will run after DOM update
     setTimeout(() => {
       msgDiv.querySelectorAll("code").forEach(el => hljs.highlightElement(el));
     }, 50);
   } else {
-    // Typing animation for plain text
+    // Typing animation for text
     let i = 0;
     function typeChar() {
       if (i <= text.length) {
@@ -37,11 +42,6 @@ function typeAIMessage(text, isCode = false) {
     }
     typeChar();
   }
-}
-
-// Escape HTML for safety
-function escapeHTML(str) {
-  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 // --- Add user message ---
@@ -85,9 +85,11 @@ function handleV1(message) {
   }
 }
 
-// --- v1.5: Execution server ---
+// --- v1.5: Python execution ---
 async function handleV15(code) {
   try {
+    serverWakeup.style.display = "flex"; // show wakeup container
+
     const response = await fetch("https://pycode-server.onrender.com/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -96,9 +98,12 @@ async function handleV15(code) {
 
     const data = await response.json();
     return data?.output || "PYCODE: No output returned";
+
   } catch (err) {
     console.error(err);
     return "PYCODE: Error executing code";
+  } finally {
+    serverWakeup.style.display = "none"; // hide container after response
   }
 }
 
@@ -109,8 +114,8 @@ async function getResponse(message) {
   else return "This version is not supported yet.";
 }
 
-// --- Event listeners ---
-sendBtn.addEventListener("click", async () => {
+// --- Send message ---
+async function sendMessage() {
   const message = userInput.value.trim();
   if (!message) return;
 
@@ -119,23 +124,31 @@ sendBtn.addEventListener("click", async () => {
 
   const response = await getResponse(message);
   typeAIMessage(response, currentVersion === "v1.5");
+}
+
+// --- Event listeners ---
+sendBtn.addEventListener("click", sendMessage);
+
+userInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault(); // prevent newline
+    sendMessage();
+  }
 });
 
-userInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") sendBtn.click();
-});
-
+// --- Theme change ---
 themeSelect.addEventListener("change", () => {
   document.body.className = themeSelect.value + "-mode";
 });
 
+// --- Version change ---
 versionSelect.addEventListener("change", async () => {
   currentVersion = versionSelect.value;
   messagesContainer.innerHTML = "";
   typeAIMessage("How can I help you today?");
 });
 
-// --- Header animated typing (fixed reset issue) ---
+// --- Header animated typing ---
 const texts = [
   "HELPING THE LOGIC CREATOR",
   "A new era with Python and programming",
@@ -144,16 +157,12 @@ const texts = [
 
 let textIndex = 0, charIndex = 0;
 function typeEffect() {
-  if (charIndex === 0) {
-    animatedText.textContent = ""; // reset before typing new text
-  }
+  if (charIndex === 0) animatedText.textContent = "";
   if (charIndex < texts[textIndex].length) {
     animatedText.textContent += texts[textIndex].charAt(charIndex);
     charIndex++;
     setTimeout(typeEffect, 100);
-  } else {
-    setTimeout(eraseEffect, 1500);
-  }
+  } else setTimeout(eraseEffect, 1500);
 }
 function eraseEffect() {
   if (charIndex > 0) {
