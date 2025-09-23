@@ -88,7 +88,9 @@ function handleV1(message) {
 // --- v1.5: Python execution with server wake-up ---
 async function handleV15(code) {
   try {
-    serverWakeup.style.display = "flex"; // Show server container
+    // Show the server wakeup container
+    serverWakeup.style.display = "flex";
+
     const response = await fetch("https://pycode-server.onrender.com/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -101,7 +103,8 @@ async function handleV15(code) {
     console.error(err);
     return "PYCODE: Error executing code";
   } finally {
-    serverWakeup.style.display = "none"; // Hide after response
+    // Hide it once output arrives or error occurs
+    serverWakeup.style.display = "none";
   }
 }
 
