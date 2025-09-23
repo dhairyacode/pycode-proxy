@@ -8,12 +8,12 @@ const serverWakeup = document.getElementById("serverWakeup");
 
 let currentVersion = "v1.0";
 
-// --- Escape HTML ---
+// --- Escape HTML for safety ---
 function escapeHTML(str) {
   return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// --- Typing animation for AI messages ---
+// --- ChatGPT-style typing for AI messages ---
 function typeAIMessage(text, isCode = false) {
   const msgDiv = document.createElement("div");
   msgDiv.className = "chat-message left";
@@ -21,16 +21,16 @@ function typeAIMessage(text, isCode = false) {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   if (isCode) {
-    // Code block with highlight.js
+    // Show code immediately with syntax highlight
     msgDiv.innerHTML = `
-      <strong>PYCODE:</strong> Here is your output:<br>
+      <strong>PYCODE:</strong> Here is your code output:<br>
       <pre><code class="language-python">${escapeHTML(text)}</code></pre>
     `;
     setTimeout(() => {
       msgDiv.querySelectorAll("code").forEach(el => hljs.highlightElement(el));
     }, 50);
   } else {
-    // Typing animation for text
+    // Typing animation for plain text
     let i = 0;
     function typeChar() {
       if (i <= text.length) {
@@ -85,11 +85,10 @@ function handleV1(message) {
   }
 }
 
-// --- v1.5: Python execution ---
+// --- v1.5: Python execution with server wake-up ---
 async function handleV15(code) {
   try {
-    serverWakeup.style.display = "flex"; // show wakeup container
-
+    serverWakeup.style.display = "flex"; // Show server container
     const response = await fetch("https://pycode-server.onrender.com/execute", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -98,12 +97,11 @@ async function handleV15(code) {
 
     const data = await response.json();
     return data?.output || "PYCODE: No output returned";
-
   } catch (err) {
     console.error(err);
     return "PYCODE: Error executing code";
   } finally {
-    serverWakeup.style.display = "none"; // hide container after response
+    serverWakeup.style.display = "none"; // Hide after response
   }
 }
 
@@ -114,7 +112,7 @@ async function getResponse(message) {
   else return "This version is not supported yet.";
 }
 
-// --- Send message ---
+// --- Send message handler ---
 async function sendMessage() {
   const message = userInput.value.trim();
   if (!message) return;
@@ -129,19 +127,18 @@ async function sendMessage() {
 // --- Event listeners ---
 sendBtn.addEventListener("click", sendMessage);
 
+// Shift+Enter multi-line support
 userInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault(); // prevent newline
+    e.preventDefault();
     sendMessage();
   }
 });
 
-// --- Theme change ---
 themeSelect.addEventListener("change", () => {
   document.body.className = themeSelect.value + "-mode";
 });
 
-// --- Version change ---
 versionSelect.addEventListener("change", async () => {
   currentVersion = versionSelect.value;
   messagesContainer.innerHTML = "";
@@ -157,13 +154,18 @@ const texts = [
 
 let textIndex = 0, charIndex = 0;
 function typeEffect() {
-  if (charIndex === 0) animatedText.textContent = "";
+  if (charIndex === 0) {
+    animatedText.textContent = ""; // reset
+  }
   if (charIndex < texts[textIndex].length) {
     animatedText.textContent += texts[textIndex].charAt(charIndex);
     charIndex++;
     setTimeout(typeEffect, 100);
-  } else setTimeout(eraseEffect, 1500);
+  } else {
+    setTimeout(eraseEffect, 1500);
+  }
 }
+
 function eraseEffect() {
   if (charIndex > 0) {
     animatedText.textContent = texts[textIndex].substring(0, charIndex - 1);
@@ -174,6 +176,7 @@ function eraseEffect() {
     setTimeout(typeEffect, 500);
   }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   if (texts.length) typeEffect();
 });

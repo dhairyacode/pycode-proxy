@@ -9,41 +9,6 @@
   <!-- Highlight.js -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <style>
-    /* --- Server Wakeup Container --- */
-    .server-wakeup {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 12px 18px;
-      margin: 10px auto;
-      border-radius: 8px;
-      background: rgba(255, 215, 0, 0.1);
-      border: 1px solid #e6c200;
-      font-family: monospace;
-      font-size: 14px;
-      color: #333;
-      max-width: 500px;
-    }
-    .dancing-bar {
-      width: 4px;
-      height: 18px;
-      background: #e6c200;
-      animation: bounce 0.6s infinite alternate;
-    }
-    @keyframes bounce {
-      from { transform: scaleY(0.4); }
-      to   { transform: scaleY(1.2); }
-    }
-    /* --- User Textarea --- */
-    #userInput {
-      resize: none;
-      min-height: 40px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-  </style>
 </head>
 <body class="light-mode">
 
@@ -86,6 +51,13 @@
       <div class="chat-message left">
         PYCODE: Hi There, What kind of doubt you have or facing any syntax error?
       </div>
+    </div>
+
+    <div id="serverWakeup" class="server-wakeup">
+    <span class="server-text">Server is full, response generation may take 1 minute</span>
+    <span class="dance-bar">
+      <span></span><span></span><span></span>
+    </span>
     </div>
 
     <div class="user-input-container">
