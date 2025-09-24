@@ -2,4 +2,4 @@ LICENSE
 
 (r) All Rights Sererved. Dhairya
 
-Anyone viewing this github resporitory is not allowed to use the given code as it is only-been set as public to run a backend private server.
+Anyone viewing this github resporitory is not allowed to use the given codes or files as they are privatly owned by the Dhairya and no one else is permitted to use the given codes.
