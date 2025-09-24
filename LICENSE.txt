@@ -1,0 +1,5 @@
+LICENSE
+
+(r) All Rights Sererved. Dhairya
+
+Anyone viewing this github resporitory is not allowed to use the given code as it is only-been set as public to run a backend private server.
