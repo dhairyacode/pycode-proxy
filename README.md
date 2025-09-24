@@ -1,5 +1,5 @@
 <h1 align="center">
-    <a href="https://dhairyacode.github.io"><img src="logo.png" width="25" height="25" alt="LOGO"></a>
+    <a href="https://dhairyacode.github.io"><img src="frontend/logo.png" width="25" height="25" alt="LOGO"></a>
   DhairyaCode
 </h1>
 
